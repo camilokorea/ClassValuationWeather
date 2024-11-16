@@ -1,5 +1,4 @@
 ﻿using ClassValuationWeather.Application.Interfaces;
-using ClassValuationWeather.Domain.Models.OpenMeteo;
 using ClassValuationWeather.Entities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -29,16 +28,16 @@ namespace ClassValuationWeather.Infrastructure.Repositories
                     {
                         Latitude = latitude,
                         Longitude = longitude,
-                        Time = (string?)json["daily"]["time"][0],
-                        SunriseDateTime = (string?)json["daily"]["sunrise"][0],
-                        Temperature = (float?)json["current"]["temperature_2m"],
-                        WindDirection = (int?)json["current"]["wind_direction_10m"],
-                        WindSpeed = (float?)json["current"]["wind_speed_10m"]
+                        Time = (string?)json["daily"]?["time"]?[0],
+                        SunriseDateTime = (string?)json["daily"]?["sunrise"]?[0],
+                        Temperature = (float?)json["current"]?["temperature_2m"],
+                        WindDirection = (int?)json["current"]?["wind_direction_10m"],
+                        WindSpeed = (float?)json["current"]?["wind_speed_10m"]
                     };
 
                     return item;
                 }
-                catch (HttpRequestException e)
+                catch
                 {
                     throw;
                 }

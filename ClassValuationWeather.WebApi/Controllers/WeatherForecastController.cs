@@ -21,7 +21,7 @@ namespace ClassValuationWeather.WebApi.Controllers
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
-        public async Task<WeatherItemResponse> GetWeatherForecast(float latitude, float longitude)
+        public async Task<WeatherItemResponse?> GetWeatherForecast(float latitude, float longitude)
         {
             return await _meteoService.SynchData(longitude, latitude);
         }

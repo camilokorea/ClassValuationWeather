@@ -31,10 +31,10 @@ namespace ClassValuationWeather.Application.Services
                 {
                     return new WeatherItemResponse
                     {
-                        SunriseDateTime = weatherItem.SunriseDateTime,
-                        Temperature = weatherItem.Temperature,
-                        WindDirection = weatherItem.WindDirection,
-                        WindSpeed = weatherItem.WindSpeed
+                        SunriseDateTime = weatherItem?.SunriseDateTime,
+                        Temperature = weatherItem?.Temperature,
+                        WindDirection = weatherItem?.WindDirection,
+                        WindSpeed = weatherItem?.WindSpeed
                     };
                 }
                 else
@@ -48,10 +48,10 @@ namespace ClassValuationWeather.Application.Services
 
                     return new WeatherItemResponse
                     {
-                        SunriseDateTime = weatherItem.SunriseDateTime,
-                        Temperature = weatherItem.Temperature,
-                        WindDirection = weatherItem.WindDirection,
-                        WindSpeed = weatherItem.WindSpeed
+                        SunriseDateTime = weatherItem?.SunriseDateTime,
+                        Temperature = weatherItem?.Temperature,
+                        WindDirection = weatherItem?.WindDirection,
+                        WindSpeed = weatherItem?.WindSpeed
                     };
                 }
             }
