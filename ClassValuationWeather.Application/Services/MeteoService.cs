@@ -4,6 +4,7 @@ using ClassValuationWeather.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -111,7 +112,7 @@ namespace ClassValuationWeather.Application.Services
                 {
                     List<CityCoordinates>? cityCoordinates = await _dataRepository.GetCityCoordinates(cityName);
 
-                    if (cityCoordinates == null)
+                    if (cityCoordinates.Count == 0)
                     {
                         cityCoordinates = await _openMeteoRepository.GetCitiesByCityName(cityName);
 
@@ -135,7 +136,7 @@ namespace ClassValuationWeather.Application.Services
                     {
                         cityCoordinates.ForEach((coordinatesItem) =>
                         {
-                            if (weatherItem.Latitude == coordinatesItem.Latitude && weatherItem.Longitude == coordinatesItem.Longitude)
+                            if (weatherItem.Latitude?.ToString(CultureInfo.InvariantCulture) == coordinatesItem.Latitude?.ToString(CultureInfo.InvariantCulture) && weatherItem.Longitude?.ToString(CultureInfo.InvariantCulture) == coordinatesItem.Longitude?.ToString(CultureInfo.InvariantCulture))
                             {
                                 response.Add(new WeatherItemResponseByCity
                                 {

@@ -2,6 +2,7 @@
 using ClassValuationWeather.Domain.Entities;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
+using System.Text.Json.Nodes;
 
 namespace ClassValuationWeather.Infrastructure.Repositories
 {
@@ -31,18 +32,38 @@ namespace ClassValuationWeather.Infrastructure.Repositories
 
                     string jsonString = await response.Content.ReadAsStringAsync();
 
-                    JObject json = JObject.Parse(jsonString);
-
-                    weatherItems.Add(new WeatherItem
+                    if (coordinates.Count > 1)
                     {
-                        Latitude = (float?)json["latitude"],
-                        Longitude = (float?)json["longitude"],
-                        Time = (string?)json["daily"]?["time"]?[0],
-                        SunriseDateTime = (string?)json["daily"]?["sunrise"]?[0],
-                        Temperature = (float?)json["current"]?["temperature_2m"],
-                        WindDirection = (int?)json["current"]?["wind_direction_10m"],
-                        WindSpeed = (float?)json["current"]?["wind_speed_10m"]
-                    });
+                        JArray jsonArray = JArray.Parse(jsonString);
+
+                        weatherItems.AddRange(from resultItem in jsonArray
+                                              select new WeatherItem
+                                              {
+                                                  Latitude = (float?)resultItem["latitude"],
+                                                  Longitude = (float?)resultItem["longitude"],
+                                                  Time = (string?)resultItem["daily"]?["time"]?[0],
+                                                  SunriseDateTime = (string?)resultItem["daily"]?["sunrise"]?[0],
+                                                  Temperature = (float?)resultItem["current"]?["temperature_2m"],
+                                                  WindDirection = (int?)resultItem["current"]?["wind_direction_10m"],
+                                                  WindSpeed = (float?)resultItem["current"]?["wind_speed_10m"]
+
+                                              });
+                    }
+                    else
+                    {
+                        JObject json = JObject.Parse(jsonString);
+
+                        weatherItems.Add(new WeatherItem
+                        {
+                            Latitude = (float?)json["latitude"],
+                            Longitude = (float?)json["longitude"],
+                            Time = (string?)json["daily"]?["time"]?[0],
+                            SunriseDateTime = (string?)json["daily"]?["sunrise"]?[0],
+                            Temperature = (float?)json["current"]?["temperature_2m"],
+                            WindDirection = (int?)json["current"]?["wind_direction_10m"],
+                            WindSpeed = (float?)json["current"]?["wind_speed_10m"]
+                        });
+                    }
 
                     return weatherItems;
                 }
@@ -74,16 +95,16 @@ namespace ClassValuationWeather.Infrastructure.Repositories
                     if (json != null)
                     {
                         cityCoordinates.AddRange(from resultItem in json["results"]
-                                              select new CityCoordinates
-                                              {
-                                                  Latitude = (float?)resultItem["latitude"],
-                                                  Longitude = (float?)resultItem["longitude"],
-                                                  City = (string?)resultItem["city"],
-                                                  Country = (string?)resultItem["country"],
-                                                  Admin1 = (string?)resultItem["admin1"],
-                                                  Admin2 = (string?)resultItem["admin2"],
-                                                  Admin3 = (string?)resultItem["admin3"]
-                                              });
+                                                 select new CityCoordinates
+                                                 {
+                                                     Latitude = (float?)resultItem["latitude"],
+                                                     Longitude = (float?)resultItem["longitude"],
+                                                     City = (string?)resultItem["name"],
+                                                     Country = (string?)resultItem["country"],
+                                                     Admin1 = (string?)resultItem["admin1"],
+                                                     Admin2 = (string?)resultItem["admin2"],
+                                                     Admin3 = (string?)resultItem["admin3"]
+                                                 });
                     }
 
                     return cityCoordinates;

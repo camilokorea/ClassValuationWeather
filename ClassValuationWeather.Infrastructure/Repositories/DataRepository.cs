@@ -24,7 +24,7 @@ namespace ClassValuationWeather.Infrastructure.Repositories
 
                 _weatherItemCollection = _database.GetCollection<WeatherItem>("WeatherItems");
 
-                _weatherItemCollection = _database.GetCollection<WeatherItem>("CityCoordinates");
+                _cityCoordinatesCollection = _database.GetCollection<CityCoordinates>("CityCoordinates");
 
                 CreateIndexes();
             }

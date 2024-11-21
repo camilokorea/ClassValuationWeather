@@ -7,7 +7,7 @@ namespace ClassValuationWeather.Domain.Entities
     {
         [BsonId]
         [BsonElement("_id"), BsonRepresentation(BsonType.ObjectId)]
-        public ObjectId? Id { get; set; }
+        public string? Id { get; set; }
 
         [BsonElement("time"), BsonRepresentation(BsonType.String)]
         public string? Time { get; set; }
