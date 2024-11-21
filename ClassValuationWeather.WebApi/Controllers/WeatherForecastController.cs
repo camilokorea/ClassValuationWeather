@@ -1,13 +1,11 @@
 using ClassValuationWeather.Application.DTO;
 using ClassValuationWeather.Application.Interfaces;
-using ClassValuationWeather.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
 namespace ClassValuationWeather.WebApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]/[action]")]
     public class WeatherForecastController : ControllerBase
     {
         private readonly ILogger<WeatherForecastController> _logger;
@@ -20,10 +18,16 @@ namespace ClassValuationWeather.WebApi.Controllers
             _meteoService = meteoService;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public async Task<WeatherItemResponse?> GetWeatherForecast(float latitude, float longitude)
+        [HttpGet(Name = "GetWeatherForecastByLoc")]
+        public async Task<WeatherItemResponse?> GetWeatherForecastByLoc(float latitude, float longitude)
         {
-            return await _meteoService.SynchData(longitude, latitude);
+            return await _meteoService.SynchDataByLoc(longitude, latitude);
+        }
+
+        [HttpGet(Name = "GetWeatherForecastByCity")]
+        public async Task<List<WeatherItemResponseByCity>?> GetWeatherForecastByCity(string city)
+        {
+            return await _meteoService.SynchDataByCity(city);
         }
     }
 }

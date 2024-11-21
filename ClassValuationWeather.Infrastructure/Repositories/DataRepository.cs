@@ -1,11 +1,6 @@
 ﻿using ClassValuationWeather.Application.Interfaces;
-using ClassValuationWeather.Entities;
+using ClassValuationWeather.Domain.Entities;
 using MongoDB.Driver;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClassValuationWeather.Infrastructure.Repositories
 {
@@ -13,7 +8,8 @@ namespace ClassValuationWeather.Infrastructure.Repositories
     {
         private readonly string _connectionString;
         private readonly IMongoDatabase? _database;
-        private readonly IMongoCollection<WeatherItem> _collection;
+        private readonly IMongoCollection<WeatherItem>? _weatherItemCollection;
+        private readonly IMongoCollection<CityCoordinates>? _cityCoordinatesCollection;
 
         public DataRepository(string connectionString)
         {
@@ -26,7 +22,9 @@ namespace ClassValuationWeather.Infrastructure.Repositories
 
                 _database = mongoClient.GetDatabase(mongoUrl.DatabaseName);
 
-                _collection = _database.GetCollection<WeatherItem>("WeatherItems");
+                _weatherItemCollection = _database.GetCollection<WeatherItem>("WeatherItems");
+
+                _weatherItemCollection = _database.GetCollection<WeatherItem>("CityCoordinates");
 
                 CreateIndexes();
             }
@@ -40,16 +38,37 @@ namespace ClassValuationWeather.Infrastructure.Repositories
 
         private void CreateIndexes()
         {
-            var indexKeys = Builders<WeatherItem>.IndexKeys
+            var geoLocIndexKeys = Builders<WeatherItem>.IndexKeys
                 .Descending(e => e.Time)
                 .Ascending(e => e.Latitude)
                 .Ascending(e => e.Longitude);
 
-            var indexModel = new CreateIndexModel<WeatherItem>(indexKeys);
-            _collection.Indexes.CreateOne(indexModel);
+            var geoLocIndexModel = new CreateIndexModel<WeatherItem>(geoLocIndexKeys);
+            _weatherItemCollection?.Indexes.CreateOne(geoLocIndexModel);
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            var cityLocIndexKeys = Builders<WeatherItem>.IndexKeys
+                .Descending(e => e.Time)
+                .Ascending(e => e.City);
+
+            var cityLocIndexModel = new CreateIndexModel<WeatherItem>(cityLocIndexKeys);
+            _weatherItemCollection?.Indexes.CreateOne(cityLocIndexModel);
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            var cityIndexKeys = Builders<CityCoordinates>.IndexKeys
+                .Ascending(e => e.City)
+                .Ascending(e => e.Country)
+                .Ascending(e => e.Admin1)
+                .Ascending(e => e.Admin2)
+                .Ascending(e => e.Admin3);
+
+            var cityIndexModel = new CreateIndexModel<CityCoordinates>(cityIndexKeys);
+            _cityCoordinatesCollection?.Indexes.CreateOne(cityIndexModel);
         }
 
-        public Task<WeatherItem> GetByLngLatTime(float longitude, float latitude, string time)
+        public async Task<WeatherItem>? GetWeatherInfoByLngLatTime(float longitude, float latitude, string time)
         {
             try
             {
@@ -57,9 +76,9 @@ namespace ClassValuationWeather.Infrastructure.Repositories
                 filter &= (Builders<WeatherItem>.Filter.Eq(x => x.Longitude, longitude));
                 filter &= (Builders<WeatherItem>.Filter.Eq(x => x.Time, time));
 
-                var result = _collection.Find(filter).FirstOrDefaultAsync();
+                var result = await _weatherItemCollection.FindAsync(filter);
 
-                return result;
+                return result.FirstOrDefault();
             }
             catch
             {
@@ -67,14 +86,16 @@ namespace ClassValuationWeather.Infrastructure.Repositories
             }
         }
 
-        public async Task SaveWeatherInfoByCoordinates(WeatherItem? item)
+        public async Task<List<WeatherItem>>? GetWeatherInfoByCityTime(string city, string time)
         {
             try
             {
-                if (item != null)
-                {
-                    await _collection.InsertOneAsync(item);
-                }
+                var filter = Builders<WeatherItem>.Filter.Eq(x => x.City, city);
+                filter &= (Builders<WeatherItem>.Filter.Eq(x => x.Time, time));
+
+                var responseItems = await _weatherItemCollection.FindAsync(filter);
+
+                return responseItems.ToList();
             }
             catch
             {
@@ -82,5 +103,44 @@ namespace ClassValuationWeather.Infrastructure.Repositories
             }
         }
 
+        public async Task<List<CityCoordinates>>? GetCityCoordinates(string city)
+        {
+            try
+            {
+                var filter = Builders<CityCoordinates>.Filter.Eq(x => x.City, city);
+
+                var result = await _cityCoordinatesCollection.FindAsync(filter);
+
+                return result.ToList();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task SaveWeatherInfoByCoordinates(List<WeatherItem> items)
+        {
+            try
+            {
+                await _weatherItemCollection.InsertManyAsync(items);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task SaveCityCoordinates(List<CityCoordinates> cityCoordinates)
+        {
+            try
+            {
+                await _cityCoordinatesCollection.InsertManyAsync(cityCoordinates);
+            }
+            catch
+            {
+                throw;
+            }
+        }
     }
 }

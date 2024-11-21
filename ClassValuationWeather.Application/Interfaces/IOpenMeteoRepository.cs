@@ -1,14 +1,10 @@
-﻿using ClassValuationWeather.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ClassValuationWeather.Domain.Entities;
 
 namespace ClassValuationWeather.Application.Interfaces
 {
     public interface IOpenMeteoRepository
     {
-        public Task<WeatherItem> GetWeatherInfoByCoordinates(float longitude, float latitude);
+        public Task<List<WeatherItem>> GetWeatherInfoByCoordinates(List<Coordinates> coordinates);
+        public Task<List<CityCoordinates>> GetCitiesByCityName(string cityName);
     }
 }

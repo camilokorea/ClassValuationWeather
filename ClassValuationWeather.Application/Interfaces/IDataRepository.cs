@@ -1,11 +1,17 @@
-﻿using ClassValuationWeather.Entities;
+﻿using ClassValuationWeather.Domain.Entities;
 
 namespace ClassValuationWeather.Application.Interfaces
 {
     public interface IDataRepository
     {
-        Task<WeatherItem> GetByLngLatTime(float longitude, float latitude, string time);
+        Task<WeatherItem>? GetWeatherInfoByLngLatTime(float longitude, float latitude, string time);
 
-        public Task SaveWeatherInfoByCoordinates(WeatherItem? item);
+        Task<List<WeatherItem>>? GetWeatherInfoByCityTime(string city, string time);
+
+        Task<List<CityCoordinates>>? GetCityCoordinates(string city);
+
+        Task SaveWeatherInfoByCoordinates(List<WeatherItem> items);
+
+        Task SaveCityCoordinates(List<CityCoordinates> cityCoordinates);
     }
 }

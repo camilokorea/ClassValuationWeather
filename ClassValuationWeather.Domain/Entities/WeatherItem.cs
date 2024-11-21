@@ -1,13 +1,13 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace ClassValuationWeather.Entities
+namespace ClassValuationWeather.Domain.Entities
 {
     public class WeatherItem
     {
         [BsonId]
         [BsonElement("_id"), BsonRepresentation(BsonType.ObjectId)]
-        public string? Id { get; set; }
+        public ObjectId? Id { get; set; }
 
         [BsonElement("time"), BsonRepresentation(BsonType.String)]
         public string? Time { get; set; }
@@ -29,5 +29,20 @@ namespace ClassValuationWeather.Entities
 
         [BsonElement("sunrise_date_time"), BsonRepresentation(BsonType.String)]
         public string? SunriseDateTime { get; set; }
+
+        [BsonElement("city"), BsonRepresentation(BsonType.String)]
+        public string? City { get; set; }
+
+        [BsonElement("country"), BsonRepresentation(BsonType.String)]
+        public string? Country { get; set; }
+
+        [BsonElement("admin1"), BsonRepresentation(BsonType.String)]
+        public string? Admin1 { get; set; }
+
+        [BsonElement("admin2"), BsonRepresentation(BsonType.String)]
+        public string? Admin2 { get; set; }
+
+        [BsonElement("admin3"), BsonRepresentation(BsonType.String)]
+        public string? Admin3 { get; set; }
     }
 }
