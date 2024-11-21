@@ -132,34 +132,33 @@ namespace ClassValuationWeather.Application.Services
 
                     weatherItems = await _openMeteoRepository.GetWeatherInfoByCoordinates(coordinates);
 
-                    weatherItems.ForEach(weatherItem =>
-                    {
-                        cityCoordinates.ForEach((coordinatesItem) =>
-                        {
-                            if (weatherItem.Latitude?.ToString(CultureInfo.InvariantCulture) == coordinatesItem.Latitude?.ToString(CultureInfo.InvariantCulture) && weatherItem.Longitude?.ToString(CultureInfo.InvariantCulture) == coordinatesItem.Longitude?.ToString(CultureInfo.InvariantCulture))
-                            {
-                                response.Add(new WeatherItemResponseByCity
-                                {
-                                    Admin1 = coordinatesItem.Admin1,
-                                    Admin2 = coordinatesItem.Admin2,
-                                    Admin3 = coordinatesItem.Admin3,
-                                    City = coordinatesItem.City,
-                                    Country = coordinatesItem.Country,
-                                    SunriseDateTime = weatherItem.SunriseDateTime,
-                                    Temperature = weatherItem.Temperature,
-                                    WindDirection = weatherItem.WindDirection,
-                                    WindSpeed = weatherItem.WindSpeed
-                                });
 
-                                weatherItems[weatherItems.IndexOf(weatherItems.Find(x => x.Latitude == weatherItem.Latitude && x.Longitude == weatherItem.Longitude))] = weatherItem;
-                            }
+                    for (int i = 0; i < weatherItems.Count; i++)
+                    {
+                        response.Add(new WeatherItemResponseByCity
+                        {
+                            Admin1 = cityCoordinates[i].Admin1,
+                            Admin2 = cityCoordinates[i].Admin2,
+                            Admin3 = cityCoordinates[i].Admin3,
+                            City = cityCoordinates[i].City,
+                            Country = cityCoordinates[i].Country,
+                            SunriseDateTime = weatherItems[i].SunriseDateTime,
+                            Temperature = weatherItems[i].Temperature,
+                            WindDirection = weatherItems[i].WindDirection,
+                            WindSpeed = weatherItems[i].WindSpeed
                         });
-                    });
+
+                        weatherItems[i].Admin1 = cityCoordinates[i].Admin1;
+                        weatherItems[i].Admin2 = cityCoordinates[i].Admin2;
+                        weatherItems[i].Admin3 = cityCoordinates[i].Admin3;
+                        weatherItems[i].City = cityCoordinates[i].City;
+                        weatherItems[i].Country = cityCoordinates[i].Country;
+                    }
 
                     await _dataRepository.SaveWeatherInfoByCoordinates(weatherItems);
                 }
 
-                return response;
+                return response.FindAll(x => x.City == cityName);
             }
             catch
             {
